@@ -40,7 +40,10 @@ module ActiveStorage
     def upload(key, io, checksum: nil, content_type: nil, disposition: nil, filename: nil)
       instrument :upload, key: key, checksum: checksum do
         begin
-          result = @upyun.put(path_for(key), io)
+          headers = { 'Content-Type': content_type }
+          # result = @upyun.put(path_for(key), io)
+          # path = [key, resource_format(filename)].join('.')
+          result = @upyun.put(path_for(key), io, headers)
           result
         rescue
           raise ActiveStorage::IntegrityError
@@ -152,5 +155,10 @@ module ActiveStorage
     def gmdate
       Time.now.utc.strftime('%a, %d %b %Y %H:%M:%S GMT')
     end
+
+    # def resource_format(filename)
+    #   extension = filename&.extension_with_delimiter || ''
+    #   extension.sub('.', '')
+    # end
   end
 end
